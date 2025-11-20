@@ -1,193 +1,692 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kuis Sejarah Jawa Timur</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Kuis Sejarah Jawa Timur — FESTIKA JATIM 2025</title>
+<style>
+  :root{
+    --bg: #f4f7fb;
+    --card:#ffffff;
+    --text:#1f2937;
+    --accent:#2563eb;
+    --muted:#6b7280;
+    --correct:#16a34a;
+    --wrong:#dc2626;
+    --glass: rgba(255,255,255,0.6);
+  }
+  [data-theme="dark"]{
+    --bg:#0b1220;
+    --card:#071021;
+    --text:#e6eef9;
+    --accent:#60a5fa;
+    --muted:#9aa9bf;
+    --glass: rgba(255,255,255,0.03);
+  }
 
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f5f5f5;
-            margin: 0;
-            padding: 0;
-        }
-
-        .container {
-            max-width: 700px;
-            margin: 40px auto;
-            background: white;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0px 4px 20px rgba(0,0,0,0.1);
-        }
-
-        h1 {
-            text-align: center;
-            margin-bottom: 10px;
-            color: #333;
-        }
-
-        #question {
-            font-size: 20px;
-            font-weight: bold;
-            margin-bottom: 15px;
-        }
-
-        .option {
-            background: #ebebeb;
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            cursor: pointer;
-            border: 2px solid transparent;
-        }
-
-        .option:hover {
-            background: #dcdcdc;
-        }
-
-        .correct {
-            border-color: green;
-            background: #c7f9cc;
-        }
-
-        .wrong {
-            border-color: red;
-            background: #ffb3b3;
-        }
-
-        #nextBtn {
-            width: 100%;
-            padding: 12px;
-            background: #007bff;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            display: none;
-            margin-top: 15px;
-        }
-
-        #nextBtn:hover {
-            background: #0056b3;
-        }
-
-        #scoreBox {
-            text-align: center;
-            font-size: 22px;
-            margin-top: 20px;
-            color: #333;
-            display: none;
-        }
-    </style>
-
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,"Helvetica Neue",Arial;padding:18px;background:linear-gradient(180deg,var(--bg),#e9f0ff);color:var(--text)}
+  .wrap{max-width:980px;margin:0 auto;display:grid;grid-template-columns:1fr 340px;gap:18px;align-items:start}
+  @media(max-width:900px){.wrap{grid-template-columns:1fr;padding-bottom:60px}.sidebar{order:2}}
+  .card{background:var(--card);border-radius:14px;padding:18px;box-shadow:0 6px 24px rgba(16,24,40,0.08);backdrop-filter: blur(6px)}
+  header{display:flex;gap:12px;align-items:center;margin-bottom:12px}
+  header h1{font-size:20px;margin:0}
+  .meta{font-size:13px;color:var(--muted)}
+  .question-box{min-height:140px;display:flex;flex-direction:column;justify-content:center}
+  .question-text{font-size:18px;font-weight:600;margin-bottom:12px}
+  .options{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media(max-width:520px){.options{grid-template-columns:1fr}}
+  .opt{
+    padding:12px;border-radius:10px;background:linear-gradient(180deg,#f7fbff,var(--glass));
+    cursor:pointer;border:2px solid transparent;transition:all .25s;user-select:none;
+    box-shadow:0 3px 10px rgba(2,6,23,0.04);
+  }
+  .opt:hover{transform:translateY(-4px)}
+  .opt.disabled{pointer-events:none;opacity:.9;transform:none}
+  .opt.correct{border-color:var(--correct);background:linear-gradient(180deg,#e6ffef,#e9fff0)}
+  .opt.wrong{border-color:var(--wrong);background:linear-gradient(180deg,#fff0f0,#ffecec)}
+  .controls{display:flex;gap:8px;margin-top:14px;align-items:center}
+  .btn{padding:10px 14px;border-radius:8px;border:none;cursor:pointer;background:var(--accent);color:white;font-weight:600}
+  .btn.ghost{background:transparent;color:var(--accent);border:1px solid rgba(37,99,235,0.12)}
+  .small{font-size:13px;padding:8px 10px}
+  .progress{height:12px;background:rgba(0,0,0,0.06);border-radius:12px;overflow:hidden;margin-top:10px}
+  .progress > i{display:block;height:100%;width:100%;background:linear-gradient(90deg,var(--accent),#06b6d4);transform-origin:left;transform:scaleX(1);transition:transform linear}
+  .sidebar .card{position:sticky; top:18px}
+  .leaderboard-list{max-height:280px;overflow:auto;margin-top:8px}
+  .leader-item{display:flex;justify-content:space-between;padding:8px;border-radius:8px;margin-bottom:6px;background:linear-gradient(180deg,#f8fafc,var(--glass));font-size:14px}
+  .settings{display:grid;gap:8px;margin-top:8px}
+  .toggle{display:flex;align-items:center;justify-content:space-between;padding:8px;border-radius:8px;background:linear-gradient(180deg,#fbfdff,var(--glass))}
+  .explain{margin-top:10px;padding:10px;border-radius:8px;background:linear-gradient(180deg,#fff8e6,var(--glass));font-size:14px;color:var(--text)}
+  .footer-note{font-size:13px;color:var(--muted);margin-top:10px}
+  .center{text-align:center}
+  .hidden{display:none}
+  .topbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}
+  .title-small{font-size:13px;color:var(--muted)}
+  .animate-fade{animation:fadeIn .35s ease}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .timer-left{font-weight:700;color:var(--muted);padding:6px 10px;border-radius:8px;background:linear-gradient(180deg,#fff,var(--glass));}
+  .kbd{background:rgba(0,0,0,0.06);padding:6px 8px;border-radius:6px;font-weight:600;font-size:13px}
+  .big-score{font-size:18px;font-weight:700}
+  .logo{display:flex;gap:10px;align-items:center}
+  .logo .dot{width:36px;height:36px;border-radius:8px;background:var(--accent);display:inline-block}
+  .controls-right{margin-left:auto;display:flex;gap:8px;align-items:center}
+  footer{margin-top:18px;font-size:13px;color:var(--muted)}
+</style>
 </head>
 <body>
+<div class="wrap">
+  <main>
+    <div class="card animate-fade">
+      <div class="topbar">
+        <div style="display:flex;gap:12px;align-items:center">
+          <div class="logo"><span class="dot"></span></div>
+          <div>
+            <h1 style="margin:0">Kuis Sejarah Jawa Timur</h1>
+            <div class="title-small">FESTIKA JATIM 2025 — Digitalisasi Pembelajaran Bermakna</div>
+          </div>
+        </div>
 
-    <div class="container">
-        <h1>Kuis Sejarah Jawa Timur</h1>
-        <div id="question"></div>
-        <div id="options"></div>
-        <button id="nextBtn" onclick="nextQuestion()">Soal Berikutnya</button>
-        <div id="scoreBox"></div>
+        <div class="controls-right">
+          <div class="timer-left" id="timerText">20s</div>
+          <div class="kbd" id="qIndex">Soal 1/10</div>
+        </div>
+      </div>
+
+      <div class="question-box">
+        <div id="questionArea" class="question-text">Memuat soal...</div>
+        <div id="optionsArea" class="options"></div>
+
+        <div class="progress" aria-hidden="true">
+          <i id="timeBar" style="transform:scaleX(1)"></i>
+        </div>
+
+        <div id="explanation" class="explain hidden"></div>
+
+        <div class="controls">
+          <button id="nextBtn" class="btn" style="display:none">Soal Berikutnya</button>
+          <button id="pauseBtn" class="btn ghost small">⏸ Pause Music</button>
+          <button id="restartBtn" class="btn ghost small">🔁 Mulai Ulang</button>
+          <div style="margin-left:auto;display:flex;gap:8px">
+            <button id="saveScoreBtn" class="btn ghost small hidden">💾 Simpan Skor</button>
+          </div>
+        </div>
+
+      </div>
     </div>
 
-    <script>
-        const quizData = [
-            {
-                question: "Kerajaan besar Majapahit berada di daerah…",
-                options: ["Mojokerto", "Malang", "Sidoarjo", "Surabaya"],
-                answer: 0
-            },
-            {
-                question: "Siapakah pendiri Kerajaan Singhasari?",
-                options: ["Ken Arok", "Kertanegara", "Gajah Mada", "Raden Wijaya"],
-                answer: 0
-            },
-            {
-                question: "Peristiwa 10 November di Surabaya dikenal sebagai…",
-                options: [
-                    "Hari Pancasila",
-                    "Hari Kebangkitan Nasional",
-                    "Hari Pahlawan",
-                    "Hari Reformasi"
-                ],
-                answer: 2
-            },
-            {
-                question: "Siapakah tokoh yang terkenal dengan Sumpah Palapa?",
-                options: ["Hayam Wuruk", "Gajah Mada", "Brawijaya V", "Ken Dedes"],
-                answer: 1
-            },
-            {
-                question: "Gedung bersejarah 'Tugu Pahlawan' berada di kota…",
-                options: ["Madiun", "Surabaya", "Bojonegoro", "Kediri"],
-                answer: 1
-            }
-        ];
+    <div style="height:14px"></div>
 
-        let current = 0;
-        let score = 0;
+    <div class="card animate-fade">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div style="font-weight:700">Hasil & Statistik</div>
+        <div id="liveStats" class="meta">Benar: 0 • Salah: 0 • Waktu: 0s</div>
+      </div>
 
-        const questionBox = document.getElementById("question");
-        const optionsBox = document.getElementById("options");
-        const scoreBox = document.getElementById("scoreBox");
-        const nextBtn = document.getElementById("nextBtn");
+      <div style="display:flex;gap:8px;margin-top:12px;align-items:center">
+        <div class="big-score" id="scoreDisplay">Skor: 0</div>
+        <div style="margin-left:auto">
+          <button id="showLeaderboardBtn" class="btn ghost small">Lihat Leaderboard</button>
+        </div>
+      </div>
 
-        function loadQuestion() {
-            const q = quizData[current];
-            questionBox.innerText = `Soal ${current + 1}: ${q.question}`;
+      <div style="margin-top:10px">
+        <div class="footer-note">Tips: Pilih jawaban sebelum timer habis. Penjelasan jawaban akan muncul setelah menjawab.</div>
+      </div>
+    </div>
 
-            optionsBox.innerHTML = "";
-            nextBtn.style.display = "none";
+  </main>
 
-            q.options.forEach((opt, i) => {
-                const div = document.createElement("div");
-                div.className = "option";
-                div.innerText = opt;
-                div.onclick = () => selectAnswer(i, div);
-                optionsBox.appendChild(div);
-            });
-        }
+  <aside class="sidebar">
+    <div class="card animate-fade">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div style="font-weight:700">Leaderboard</div>
+        <div class="meta">Local</div>
+      </div>
 
-        function selectAnswer(i, div) {
-            const correctIndex = quizData[current].answer;
-            const allOptions = document.querySelectorAll(".option");
+      <div class="leaderboard-list" id="leaderboardList">
+        <!-- populated by JS -->
+      </div>
 
-            allOptions.forEach(opt => opt.style.pointerEvents = "none");
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <button id="clearBoardBtn" class="btn ghost small">Reset Leaderboard</button>
+        <button id="exportBtn" class="btn small">Export</button>
+      </div>
 
-            if (i === correctIndex) {
-                div.classList.add("correct");
-                score++;
-            } else {
-                div.classList.add("wrong");
-                allOptions[correctIndex].classList.add("correct");
-            }
+      <hr style="margin:12px 0;border:none;border-top:1px solid rgba(0,0,0,0.06)">
 
-            nextBtn.style.display = "block";
-        }
+      <div style="font-weight:700">Pengaturan</div>
+      <div class="settings">
+        <div class="toggle"><div>Mode Gelap</div>
+          <div>
+            <label><input type="checkbox" id="darkToggle"> Manual</label>
+          </div>
+        </div>
 
-        function nextQuestion() {
-            current++;
-            if (current < quizData.length) {
-                loadQuestion();
-            } else {
-                showScore();
-            }
-        }
+        <div class="toggle">
+          <div>Musik Latar</div>
+          <div><label><input type="checkbox" id="musicToggle" checked> On</label></div>
+        </div>
 
-        function showScore() {
-            questionBox.style.display = "none";
-            optionsBox.style.display = "none";
-            nextBtn.style.display = "none";
-            scoreBox.style.display = "block";
-            scoreBox.innerHTML = `🎉 Kuis Selesai!<br><br>Skor Kamu: <b>${score}/${quizData.length}</b>`;
-        }
+        <div class="toggle">
+          <div>Suara Efek</div>
+          <div><label><input type="checkbox" id="sfxToggle" checked> On</label></div>
+        </div>
 
-        loadQuestion();
-    </script>
+        <div class="toggle">
+          <div>Timer per soal</div>
+          <div>
+            <select id="timerSelect">
+              <option value="10">10s</option>
+              <option value="15">15s</option>
+              <option value="20" selected>20s</option>
+              <option value="30">30s</option>
+            </select>
+          </div>
+        </div>
 
+        <div class="toggle">
+          <div>Jumlah Soal / Sesi</div>
+          <div>
+            <select id="numQuestionsSelect">
+              <option value="5">5</option>
+              <option value="10" selected>10</option>
+              <option value="15">15</option>
+              <option value="20">20</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:10px" class="footer-note">Logbook AI: Catat setiap interaksi AI (dibutuhkan untuk penilaian).</div>
+    </div>
+  </aside>
+</div>
+
+<!-- Leaderboard modal (simple) -->
+<div id="leaderModal" class="card" style="position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:90%;max-width:680px;z-index:60;display:none">
+  <div style="display:flex;justify-content:space-between;align-items:center">
+    <div style="font-weight:700">Leaderboard — FESTIKA JATIM</div>
+    <div><button id="closeBoard" class="btn ghost small">Tutup</button></div>
+  </div>
+  <div id="leaderModalList" style="margin-top:12px"></div>
+</div>
+
+<script>
+/* =========================
+   Data & Utility Functions
+   ========================= */
+
+const DEFAULT_TIMER = 20; // seconds default
+const DEFAULT_QUESTIONS = 10;
+
+const STORAGE_KEYS = {
+  leaderboard: 'festika_leaderboard_v1',
+  settings: 'festika_settings_v1'
+};
+
+// Sample bank soal (30+). You can expand. Each soal: {q, options[], answerIndex, explanation}
+const QUESTION_BANK = [
+  {q:"Kerajaan besar Majapahit berada di daerah…", options:["Mojokerto","Malang","Sidoarjo","Surabaya"], answer:0, explanation:"Majapahit berpusat di sekitar Trowulan, Mojokerto."},
+  {q:"Siapakah pendiri Kerajaan Singhasari?", options:["Ken Arok","Kertanegara","Gajah Mada","Raden Wijaya"], answer:0, explanation:"Ken Arok mendirikan Singhasari pada abad ke-13."},
+  {q:"Peristiwa 10 November di Surabaya dikenal sebagai…", options:["Hari Pancasila","Hari Kebangkitan Nasional","Hari Pahlawan","Hari Reformasi"], answer:2, explanation:"10 November diperingati sebagai Hari Pahlawan, mengenang pertempuran Surabaya 1945."},
+  {q:"Tokoh yang terkenal dengan Sumpah Palapa adalah…", options:["Hayam Wuruk","Gajah Mada","Brawijaya V","Ken Dedes"], answer:1, explanation:"Gajah Mada dikenal dengan Sumpah Palapa kala mempersatukan Nusantara."},
+  {q:"Tugu Pahlawan ada di kota…", options:["Madiun","Surabaya","Bojonegoro","Kediri"], answer:1, explanation:"Tugu Pahlawan berada di pusat kota Surabaya."},
+  {q:"Asal-usul nama Surabaya berkaitan dengan…", options:["Singa & Buaya","Gunung & Laut","Padi & Jagung","Pohon & Air"], answer:0, explanation:"Legenda Sura (ikan hiu) dan Baya (buaya) melatarbelakangi nama Surabaya."},
+  {q:"Candi terbesar di Jawa Timur yang berkaitan dengan Majapahit adalah…", options:["Candi Penataran","Candi Sukuh","Candi Prambanan","Candi Borobudur"], answer:0, explanation:"Candi Penataran (Blitar) adalah candi besar di Jatim."},
+  {q:"Kota yang menjadi pusat Kerajaan Singhasari adalah…", options:["Kediri","Malang","Jombang","Pasuruan"], answer:1, explanation:"Singhasari (sekarang sekitar Malang)." },
+  {q:"Siapa tokoh militer dari Jawa Timur yang terkenal pada era perjuangan kemerdekaan?", options:["Sudirman","Sutomo (Bung Tomo)","Sukarno","Hatta"], answer:1, explanation:"Bung Tomo memimpin semangat perjuangan Surabaya 1945."},
+  {q:"Kuliner khas Jawa Timur yang terkenal: 'Rawon' berasal dari kota…", options:["Surabaya","Jember","Kediri","Lamongan"], answer:0, explanation:"Rawon terkenal dari Surabaya (juga populer di wilayah Jatim lainnya)."},
+  {q:"Kota yang terkenal sebagai pusat kerajaan Majapahit adalah…", options:["Trowulan","Surabaya","Banyuwangi","Madura"], answer:0, explanation:"Trowulan (Mojokerto) adalah pusat Majapahit."},
+  {q:"Nama sungai yang penting pada sejarah Jawa Timur: 'Brantas' mengalir melewati…", options:["Mojokerto & Jombang","Surabaya & Sidoarjo","Banyuwangi & Jember","Malang & Probolinggo"], answer:0, explanation:"Sungai Brantas melewati beberapa kota termasuk Mojokerto & Jombang."},
+  {q:"Siapa raja Majapahit yang memerintah pada masa keemasan dan dikenal sebagai pelindung seni?", options:["Hayam Wuruk","Gajah Mada","Tribhuana Tungga Dewi","Raden Wijaya"], answer:0, explanation:"Hayam Wuruk memimpin saat Majapahit mencapai puncak."},
+  {q:"Festival kebudayaan besar yang sering diadakan di Jawa Timur berfokus pada…", options:["Kuliner & Seni Tradisi","Industri Teknologi","Pertanian Modern","Transportasi"], answer:0, explanation:"Banyak festival menampilkan kuliner dan tradisi lokal."},
+  {q:"Batik Madura memiliki ciri khas…", options:["Warna cerah & motif berani","Monokrom & sederhana","Bentuk geometris sederhana","Warna pastel"], answer:0, explanation:"Batik Madura terkenal dengan warna-warna cerah dan motif kuat."},
+  {q:"Situs sejarah peninggalan Majapahit yang dapat dikunjungi adalah…", options:["Trowulan","Candi Borobudur","Prambanan","Candi Prambanan"], answer:0, explanation:"Trowulan berisi banyak peninggalan arkeologis Majapahit."},
+  {q:"Pelabuhan penting di masa lalu untuk perdagangan Jawa Timur adalah…", options:["Gresik","Banyuwangi","Madiun","Kediri"], answer:0, explanation:"Gresik merupakan pelabuhan penting sejarah Jawa Timur."},
+  {q:"Kota yang dikenal dengan julukan 'Kota Angin' adalah…", options:["Madura","Banyuwangi","Lumajang","Jember"], answer:1, explanation:"Banyuwangi sering disebut Kota Gandrung atau daerah berangin."},
+  {q:"Nama kerajaan tua yang berpusat di Kediri adalah…", options:["Kediri","Majapahit","Singhasari","Sriwijaya"], answer:0, explanation:"Kediri adalah kerajaan kuno di Jawa Timur."},
+  {q:"Batik Tulis dari which area memiliki motif khas dengan pengaruh Islam dan China?", options:["Cirebon","Lasem (Rembang)","Madura","Probolinggo"], answer:1, explanation:"Lasem (Rembang) terkenal dengan motif batik pengaruh China & Islam; walau ada di Jateng, motif ini juga dikenal di wilayah pesisir."},
+  {q:"Tokoh proklamator yang berasal dari Jawa Timur adalah…", options:["Sukarno","Sudirman","Tan Malaka","R.A. Kartini"], answer:2, explanation:"Tan Malaka pernah aktif di Jawa Timur pada masa perjuangan (pilih sesuai konteks lokal)."},
+  {q:"Kota yang dikenal sebagai pusat pendidikan di Jawa Timur: 'Kampus' besar adalah…", options:["Malang (UM)","Surabaya (ITS/Unair)","Madiun (UMM)","Bangkalan (UNIB)"], answer:1, explanation:"Surabaya memiliki ITS dan Universitas Airlangga."},
+  {q:"Apa nama tradisi pertunjukan tari asal Jawa Timur bernama 'Reog'? berasal dari…", options:["Ponorogo","Banyuwangi","Kediri","Surabaya"], answer:0, explanation:"Reog berasal dari Ponorogo."},
+  {q:"Pantai terkenal di Jawa Timur yang jadi destinasi: 'Papuma' berada di…", options:["Jember","Banyuwangi","Lumajang","Pacitan"], answer:0, explanation:"Papuma berada di Kabupaten Jember."},
+  {q:"Museum yang menyimpan artefak sejarah Majapahit kebanyakan berada di…", options:["Trowulan (Mojokerto)","Surabaya","Malang","Batu"], answer:0, explanation:"Museum di Trowulan menyimpan banyak artefak Majapahit."},
+  {q:"Apa sebutan untuk sistem irigasi tradisional yang pernah dipakai di Jawa Timur?", options:["Subak","Sistem Tegalan","Sistem Sawah Berteras","Sistem Kemulan"], answer:2, explanation:"Sistem sawah berteras umum di lereng perbukitan."},
+  {q:"Tokoh dari Jawa Timur yang terkenal sebagai pahlawan nasional: 'Sutomo' lebih dikenal sebagai…", options:["Bung Tomo, orator perjuangan surabaya","Pemimpin militer nasional","Bupati masa kolonial","Sastrawan"], answer:0, explanation:"Sutomo alias Bung Tomo terkenal lewat orasinya memobilisasi rakyat Surabaya."},
+  {q:"Nama rumah adat yang khas di beberapa wilayah di Jatim?", options:["Joglo","Limas","Tongkonan","Rumah Gadang"], answer:0, explanation:"Joglo dikenal di Jawa (bentuk rumah tradisional Jawa)."},
+  {q:"Salah satu hasil kerajinan khas Madura yang populer adalah…", options:["Keramik & batik Madura","Tenun ikat Bali","Ukiran Jepara","Songket Palembang"], answer:0, explanation:"Madura terkenal dengan batik dan kerajinan khas."},
+  {q:"Festival seni tradisional 'Grebeg' biasanya berhubungan dengan…", options:["Agama & tradisi kerajaan","Olahraga modern","Teknologi","Pendidikan"], answer:0, explanation:"Grebeg berkaitan dengan tradisi keagamaan/kerajaan."}
+];
+
+// shuffle util
+function shuffle(arr){ for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]]} return arr; }
+
+// load settings or defaults
+const defaultSettings = { timer: DEFAULT_TIMER, numQuestions: DEFAULT_QUESTIONS, musicOn:true, sfxOn:true, darkManual:null };
+let settings = Object.assign({}, defaultSettings, JSON.parse(localStorage.getItem(STORAGE_KEYS.settings) || '{}'));
+
+// elements
+const qIndexEl = document.getElementById('qIndex');
+const timerText = document.getElementById('timerText');
+const timeBar = document.getElementById('timeBar');
+const questionArea = document.getElementById('questionArea');
+const optionsArea = document.getElementById('optionsArea');
+const nextBtn = document.getElementById('nextBtn');
+const restartBtn = document.getElementById('restartBtn');
+const scoreDisplay = document.getElementById('scoreDisplay');
+const liveStats = document.getElementById('liveStats');
+const explanationEl = document.getElementById('explanation');
+const saveScoreBtn = document.getElementById('saveScoreBtn');
+const leaderboardList = document.getElementById('leaderboardList');
+const leaderModal = document.getElementById('leaderModal');
+const leaderModalList = document.getElementById('leaderModalList');
+const showLeaderboardBtn = document.getElementById('showLeaderboardBtn');
+const closeBoard = document.getElementById('closeBoard');
+const clearBoardBtn = document.getElementById('clearBoardBtn');
+const exportBtn = document.getElementById('exportBtn');
+
+const darkToggle = document.getElementById('darkToggle');
+const musicToggle = document.getElementById('musicToggle');
+const sfxToggle = document.getElementById('sfxToggle');
+const timerSelect = document.getElementById('timerSelect');
+const numQuestionsSelect = document.getElementById('numQuestionsSelect');
+
+const pauseBtn = document.getElementById('pauseBtn');
+
+// state
+let sessionQuestions = [];
+let currentIndex = 0;
+let score = 0;
+let correctCount = 0;
+let wrongCount = 0;
+let totalTimeTaken = 0; // seconds
+let timer = null;
+let timeLeft = settings.timer;
+let isPausedMusic = false;
+let startTimestamp = null;
+
+// AudioContext for SFX + simple music
+let audioCtx = null;
+function ensureAudio(){ if(!audioCtx){ audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } }
+
+// simple beep (freq, duration)
+function beep(freq=440, dur=0.12, type='sine', gain=0.12){
+  if(!settings.sfxOn) return;
+  ensureAudio();
+  const o = audioCtx.createOscillator();
+  const g = audioCtx.createGain();
+  o.type = type;
+  o.frequency.value = freq;
+  g.gain.value = gain;
+  o.connect(g); g.connect(audioCtx.destination);
+  o.start(); o.stop(audioCtx.currentTime + dur);
+}
+
+// play correct/wrong
+function playCorrect(){ beep(880, 0.12, 'sine', 0.12); beep(1320,0.06,'sine',0.08); }
+function playWrong(){ beep(220,0.18,'triangle',0.12); }
+
+// simple looping background music (sequence) using oscillator
+let musicNode = null;
+let musicGain = null;
+let musicInterval = null;
+function startMusic(){
+  if(!settings.musicOn) return;
+  ensureAudio();
+  if(musicNode) return;
+  musicGain = audioCtx.createGain(); musicGain.gain.value = 0.06; musicGain.connect(audioCtx.destination);
+  let melody = [440,494,523,587,659,587,523,494]; // upbeat
+  let i=0;
+  musicInterval = setInterval(()=>{
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.type = 'sine';
+    const f = melody[i % melody.length];
+    o.frequency.value = f;
+    g.gain.value = 0.03;
+    o.connect(g); g.connect(musicGain);
+    o.start();
+    o.stop(audioCtx.currentTime + 0.35);
+    i++;
+  }, 320);
+  musicNode = true;
+}
+function stopMusic(){
+  if(musicInterval){ clearInterval(musicInterval); musicInterval = null; }
+  musicNode = null;
+}
+
+// settings UI initialize
+function applySettingsToUI(){
+  timerSelect.value = settings.timer;
+  numQuestionsSelect.value = settings.numQuestions;
+  musicToggle.checked = settings.musicOn;
+  sfxToggle.checked = settings.sfxOn;
+  if(settings.darkManual !== null){
+    darkToggle.checked = settings.darkManual;
+    document.documentElement.setAttribute('data-theme', settings.darkManual ? 'dark' : 'light');
+  } else {
+    darkToggle.checked = false;
+    // follow system
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    document.documentElement.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
+  }
+}
+applySettingsToUI();
+
+// persist settings
+function saveSettings(){
+  localStorage.setItem(STORAGE_KEYS.settings, JSON.stringify(settings));
+}
+
+// Leaderboard functions
+function getLeaderboard(){ return JSON.parse(localStorage.getItem(STORAGE_KEYS.leaderboard) || '[]'); }
+function saveLeaderboard(list){ localStorage.setItem(STORAGE_KEYS.leaderboard, JSON.stringify(list)); }
+function addLeaderboardEntry(name, scoreVal, timeSec){
+  const list = getLeaderboard();
+  list.push({name,score:scoreVal,time:timeSec,ts:Date.now()});
+  // sort desc by score then time asc
+  list.sort((a,b)=> b.score - a.score || a.time - b.time);
+  if(list.length>50) list.length = 50;
+  saveLeaderboard(list);
+  renderLeaderboard();
+}
+
+function renderLeaderboard(){
+  const list = getLeaderboard();
+  leaderboardList.innerHTML = '';
+  leaderModalList.innerHTML = '';
+  if(list.length===0){
+    leaderboardList.innerHTML = '<div class="meta">Belum ada skor tersimpan.</div>';
+    leaderModalList.innerHTML = '<div class="meta">Belum ada skor tersimpan.</div>';
+    return;
+  }
+  list.slice(0,20).forEach((it, idx)=>{
+    const el = document.createElement('div');
+    el.className = 'leader-item';
+    el.innerHTML = `<div style="font-weight:700">${idx+1}. ${escapeHtml(it.name)}</div><div class="meta">${it.score} pts • ${it.time}s</div>`;
+    leaderboardList.appendChild(el);
+
+    const el2 = document.createElement('div');
+    el2.className = 'leader-item';
+    el2.innerHTML = `<div style="font-weight:700">${idx+1}. ${escapeHtml(it.name)}</div><div class="meta">${it.score} pts • ${it.time}s</div>`;
+    leaderModalList.appendChild(el2);
+  });
+}
+
+// escape html for safety
+function escapeHtml(s){ return (s+'').replace(/[&<>"']/g, (m)=> ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+
+/* ======================
+   Quiz Flow & Rendering
+   ====================== */
+
+function startSession(){
+  // reset
+  const num = parseInt(settings.numQuestions) || DEFAULT_QUESTIONS;
+  const shuffled = shuffle([...QUESTION_BANK]);
+  sessionQuestions = shuffled.slice(0, num).map(q => JSON.parse(JSON.stringify(q))); // deep copy
+  currentIndex = 0; score=0; correctCount=0; wrongCount=0; totalTimeTaken=0;
+  startTimestamp = Date.now();
+  saveScoreBtn.classList.add('hidden');
+  renderQuestion();
+  renderStats();
+  // music
+  if(settings.musicOn) startMusic();
+}
+
+function renderQuestion(){
+  const q = sessionQuestions[currentIndex];
+  qIndexEl.innerText = `Soal ${currentIndex+1}/${sessionQuestions.length}`;
+  questionArea.innerText = q.question;
+  optionsArea.innerHTML = '';
+  explanationEl.classList.add('hidden');
+  explanationEl.innerText = '';
+  nextBtn.style.display = 'none';
+
+  // randomize options mapping but keep track of correct index
+  const opts = q.options.map((o, idx)=>({txt:o, idx})); shuffle(opts);
+  q._shuffled = opts; // store mapping
+  q._shuffledIndexOfAnswer = opts.findIndex(o=>o.idx === q.answer);
+
+  opts.forEach((o, i)=>{
+    const d = document.createElement('div');
+    d.className = 'opt';
+    d.innerText = o.txt;
+    d.dataset.optIndex = i;
+    d.onclick = ()=> handleSelect(i, d);
+    optionsArea.appendChild(d);
+  });
+
+  // animate
+  questionArea.classList.add('animate-fade');
+  setTimeout(()=> questionArea.classList.remove('animate-fade'), 450);
+
+  // start timer
+  resetTimer();
+  startTimer();
+}
+
+function handleSelect(choiceIndex, el){
+  if(el.classList.contains('disabled')) return;
+  // disable all
+  const all = optionsArea.querySelectorAll('.opt');
+  all.forEach(a=>a.classList.add('disabled'));
+  stopTimer();
+
+  const q = sessionQuestions[currentIndex];
+  const correctIdx = q._shuffledIndexOfAnswer;
+  if(choiceIndex === correctIdx){
+    el.classList.add('correct');
+    score += 10;
+    correctCount++;
+    playCorrect();
+  } else {
+    el.classList.add('wrong');
+    // show true
+    all[correctIdx].classList.add('correct');
+    wrongCount++;
+    playWrong();
+  }
+
+  // show explanation
+  explanationEl.innerText = `Penjelasan: ${q.explanation || '—'}`;
+  explanationEl.classList.remove('hidden');
+  totalTimeTaken += (settings.timer - timeLeft);
+
+  // next button
+  nextBtn.style.display = 'inline-block';
+  nextBtn.onclick = ()=> {
+    currentIndex++;
+    if(currentIndex < sessionQuestions.length){
+      renderQuestion();
+    } else {
+      finishSession();
+    }
+  };
+  renderStats();
+  saveScoreBtn.classList.remove('hidden');
+}
+
+function finishSession(){
+  stopTimer();
+  stopMusic();
+  questionArea.innerText = 'Kuis selesai! Terima kasih sudah bermain.';
+  optionsArea.innerHTML = '';
+  nextBtn.style.display = 'none';
+  qIndexEl.innerText = `Selesai`;
+  scoreDisplay.innerText = `Skor: ${score}`;
+  saveScoreBtn.classList.remove('hidden');
+  // compute total time (if not tracked)
+  if(totalTimeTaken === 0) totalTimeTaken = Math.round((Date.now() - startTimestamp)/1000);
+  renderStats();
+}
+
+// Timer functions
+function resetTimer(){
+  const t = parseInt(settings.timer) || DEFAULT_TIMER;
+  timeLeft = t;
+  updateTimerUI();
+}
+function startTimer(){
+  const total = parseInt(settings.timer) || DEFAULT_TIMER;
+  timeBar.style.transform = 'scaleX(1)';
+  timerText.innerText = `${timeLeft}s`;
+  if(timer) clearInterval(timer);
+  const start = Date.now();
+  timer = setInterval(()=>{
+    const elapsed = Math.round((Date.now() - start)/1000);
+    timeLeft = total - elapsed;
+    if(timeLeft <= 0){
+      timeLeft = 0;
+      updateTimerUI();
+      clearInterval(timer);
+      // time out -> mark wrong and reveal answer
+      handleTimeout();
+    } else {
+      updateTimerUI();
+    }
+  }, 200);
+}
+function stopTimer(){ if(timer){ clearInterval(timer); timer=null; } }
+function updateTimerUI(){
+  timerText.innerText = `${timeLeft}s`;
+  const total = parseInt(settings.timer) || DEFAULT_TIMER;
+  const percent = Math.max(0, timeLeft/total);
+  timeBar.style.transform = `scaleX(${percent})`;
+}
+
+function handleTimeout(){
+  // disable options
+  const all = optionsArea.querySelectorAll('.opt');
+  all.forEach(a=>a.classList.add('disabled'));
+  // reveal correct
+  const q = sessionQuestions[currentIndex];
+  const correctIdx = q._shuffledIndexOfAnswer;
+  if(typeof correctIdx === 'number' && all[correctIdx]) all[correctIdx].classList.add('correct');
+  wrongCount++;
+  playWrong();
+  explanationEl.innerText = `Waktu habis. Penjelasan: ${q.explanation || '—'}`;
+  explanationEl.classList.remove('hidden');
+  totalTimeTaken += (settings.timer); // full time used
+  nextBtn.style.display = 'inline-block';
+  nextBtn.onclick = ()=> {
+    currentIndex++;
+    if(currentIndex < sessionQuestions.length){
+      renderQuestion();
+    } else finishSession();
+  };
+  renderStats();
+}
+
+/* ====================
+   UI actions & events
+   ==================== */
+
+document.getElementById('showLeaderboardBtn').addEventListener('click', ()=>{
+  leaderModal.style.display = 'block';
+});
+document.getElementById('closeBoard').addEventListener('click', ()=> leaderModal.style.display='none');
+clearBoardBtn.addEventListener('click', ()=>{
+  if(confirm('Hapus semua leaderboard lokal?')){ localStorage.removeItem(STORAGE_KEYS.leaderboard); renderLeaderboard(); }
+});
+exportBtn.addEventListener('click', ()=>{
+  const blob = new Blob([JSON.stringify(getLeaderboard(),null,2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href=url; a.download='leaderboard_festika_jatim.json'; a.click();
+  URL.revokeObjectURL(url);
+});
+
+restartBtn.addEventListener('click', ()=>{
+  if(confirm('Mulai ulang sesi? Semua progress saat ini hilang.')) startSession();
+});
+
+saveScoreBtn.addEventListener('click', ()=>{
+  const name = prompt('Masukkan nama Anda untuk leaderboard:','Nama Peserta');
+  if(!name) return alert('Nama wajib diisi.');
+  addLeaderboardEntry(name, score, Math.round(totalTimeTaken));
+  saveScoreBtn.classList.add('hidden');
+});
+
+musicToggle.addEventListener('change', (e)=>{
+  settings.musicOn = e.target.checked;
+  saveSettings();
+  if(settings.musicOn) startMusic(); else stopMusic();
+});
+sfxToggle.addEventListener('change', (e)=>{
+  settings.sfxOn = e.target.checked;
+  saveSettings();
+});
+
+timerSelect.addEventListener('change', (e)=>{
+  settings.timer = parseInt(e.target.value);
+  saveSettings();
+});
+numQuestionsSelect.addEventListener('change', (e)=>{
+  settings.numQuestions = parseInt(e.target.value);
+  saveSettings();
+});
+
+darkToggle.addEventListener('change',(e)=>{
+  settings.darkManual = !!e.target.checked;
+  saveSettings();
+  if(settings.darkManual){
+    document.documentElement.setAttribute('data-theme','dark');
+  } else {
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    document.documentElement.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
+  }
+});
+
+// pause music btn
+pauseBtn.addEventListener('click', ()=>{
+  if(!musicNode && settings.musicOn){
+    startMusic(); pauseBtn.innerText='⏸ Pause Music';
+    return;
+  }
+  if(musicInterval){
+    stopMusic(); pauseBtn.innerText='▶️ Play Music';
+  } else {
+    startMusic(); pauseBtn.innerText='⏸ Pause Music';
+  }
+});
+
+// sfx toggles require resume audio context on user gesture
+document.body.addEventListener('click', ()=> {
+  if(audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+}, {once:true});
+
+// render initial leaderboard
+renderLeaderboard();
+
+// show stats
+function renderStats(){
+  scoreDisplay.innerText = `Skor: ${score}`;
+  liveStats.innerText = `Benar: ${correctCount} • Salah: ${wrongCount} • Waktu: ${Math.round(totalTimeTaken)}s`;
+}
+
+/* ======= keyboard shortcuts ======= */
+document.addEventListener('keydown', (e)=>{
+  if(e.key === 'r' || e.key === 'R'){ if(confirm('Restart?')) startSession(); }
+  if(e.key === 'l' || e.key === 'L'){ leaderModal.style.display = 'block'; }
+});
+
+/* Save default settings if not present */
+if(!localStorage.getItem(STORAGE_KEYS.settings)){
+  localStorage.setItem(STORAGE_KEYS.settings, JSON.stringify(settings));
+}
+
+/* Initialize defaults then start */
+applySettingsToUI();
+startSession();
+
+/* Helper: play click when option clicked */
+optionsArea.addEventListener('click', (e)=>{
+  if(e.target.classList.contains('opt') && settings.sfxOn){
+    beep(600,0.06,'sine',0.06);
+  }
+});
+
+</script>
 </body>
 </html>
