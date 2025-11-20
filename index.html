@@ -1,4 +1,5 @@
-<!DOCTYPE html>
+# Writing fixed HTML file to /mnt/data
+fixed_html = r'''<!DOCTYPE html>
 <html lang="id">
 <head>
 <meta charset="utf-8" />
@@ -438,7 +439,8 @@ function startSession(){
 function renderQuestion(){
   const q = sessionQuestions[currentIndex];
   qIndexEl.innerText = `Soal ${currentIndex+1}/${sessionQuestions.length}`;
-  questionArea.innerText = q.question;
+  // FIXED: use q.q (bank uses key 'q')
+  questionArea.innerText = q.q;
   optionsArea.innerHTML = '';
   explanationEl.classList.add('hidden');
   explanationEl.innerText = '';
@@ -690,3 +692,11 @@ optionsArea.addEventListener('click', (e)=>{
 </script>
 </body>
 </html>
+'''
+path = "/mnt/data/KUIS-INTERAKTIF-SEJARAH-JAWA-TIMUR_fixed.html"
+with open(path, "w", encoding="utf-8") as f:
+    f.write(fixed_html)
+
+# Display link to user
+print(path)
+
