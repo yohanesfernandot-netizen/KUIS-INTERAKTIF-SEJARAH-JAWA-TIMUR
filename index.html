@@ -72,6 +72,57 @@ fixed_html = r'''<!DOCTYPE html>
   .logo .dot{width:36px;height:36px;border-radius:8px;background:var(--accent);display:inline-block}
   .controls-right{margin-left:auto;display:flex;gap:8px;align-items:center}
   footer{margin-top:18px;font-size:13px;color:var(--muted)}
+  /* ===== STAR BORDER ANIMATION ===== */
+.star-border {
+  position: relative;
+  display: inline-block;
+  border-radius: 16px;
+  padding: 0;
+  overflow: hidden;
+}
+
+.star-border .inner-content {
+  position: relative;
+  z-index: 2;
+  border-radius: 16px;
+  padding: 10px 18px;
+  background: var(--accent);
+  color: white;
+  font-weight: 600;
+}
+
+.star-border .border-gradient-bottom,
+.star-border .border-gradient-top {
+  position: absolute;
+  width: 300%;
+  height: 60%;
+  opacity: 0.8;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--accent), transparent 10%);
+  animation: star-move linear infinite alternate;
+  z-index: 1;
+}
+
+.star-border .border-gradient-bottom {
+  bottom: -20px;
+  right: -250%;
+}
+
+.star-border .border-gradient-top {
+  top: -20px;
+  left: -250%;
+}
+
+@keyframes star-move {
+  0% { transform: translate(0%, 0%); opacity: 1; }
+  100% { transform: translate(-100%, 0%); opacity: 0; }
+}
+
+/* Glow hover */
+.star-border:hover .inner-content {
+  box-shadow: 0 0 18px var(--accent);
+}
+
 </style>
 </head>
 <body>
@@ -104,11 +155,24 @@ fixed_html = r'''<!DOCTYPE html>
         <div id="explanation" class="explain hidden"></div>
 
         <div class="controls">
-          <button id="nextBtn" class="btn" style="display:none">Soal Berikutnya</button>
-          <button id="pauseBtn" class="btn ghost small">⏸ Pause Music</button>
-          <button id="restartBtn" class="btn ghost small">🔁 Mulai Ulang</button>
+          <div id="nextBtnWrap" style="display:none">
+  <div class="star-border">
+    <div class="border-gradient-top"></div>
+    <div class="border-gradient-bottom"></div>
+    <button id="nextBtn" class="inner-content" style="background:var(--accent)">Soal Berikutnya</button>
+          <div class="star-border">
+  <div class="border-gradient-top"></div>
+  <div class="border-gradient-bottom"></div>
+  <button id="pauseBtn" class="inner-content" style="background:#333">⏸ Pause Music</button>
+          <div class="star-border">
+  <div class="border-gradient-top"></div>
+  <div class="border-gradient-bottom"></div>
+  <button id="restartBtn" class="inner-content" style="background:#444">🔁 Mulai Ulang</button>
           <div style="margin-left:auto;display:flex;gap:8px">
-            <button id="saveScoreBtn" class="btn ghost small hidden">💾 Simpan Skor</button>
+            <div class="star-border" id="saveScoreBtnWrap">
+  <div class="border-gradient-top"></div>
+  <div class="border-gradient-bottom"></div>
+  <button id="saveScoreBtn" class="inner-content hidden" style="background:#444">💾 Simpan Skor</button>
           </div>
         </div>
 
@@ -123,10 +187,10 @@ fixed_html = r'''<!DOCTYPE html>
         <div id="liveStats" class="meta">Benar: 0 • Salah: 0 • Waktu: 0s</div>
       </div>
 
-      <div style="display:flex;gap:8px;margin-top:12px;align-items:center">
-        <div class="big-score" id="scoreDisplay">Skor: 0</div>
-        <div style="margin-left:auto">
-          <button id="showLeaderboardBtn" class="btn ghost small">Lihat Leaderboard</button>
+     <div class="star-border">
+  <div class="border-gradient-top"></div>
+  <div class="border-gradient-bottom"></div>
+  <button id="showLeaderboardBtn" class="inner-content" style="background:#333">Lihat Leaderboard</button>
         </div>
       </div>
 
